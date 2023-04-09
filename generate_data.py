@@ -20,17 +20,15 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
     
     c = conn.cursor()
 
-
+    c.execute("TRUNCATE TABLE api_item RESTART IDENTITY;")
     c.execute("TRUNCATE TABLE api_itemcategory RESTART IDENTITY;")
+
 
     # Generate fake data for ItemCategory
     for i in range(n):
         name = fake.word() + str(i)
         subcategory = fake.word() + str(i) if random.choice([True, False]) else None
         c.execute("INSERT INTO api_itemcategory (name, subcategory) VALUES (%s, %s)", (name, subcategory))
-
-
-    c.execute("TRUNCATE TABLE api_item RESTART IDENTITY;")
 
     # Generate fake data for Item
     for i in range(n):
