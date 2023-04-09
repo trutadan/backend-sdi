@@ -43,7 +43,7 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
         description = fake.paragraph(nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
         picture = None
 
-        c.execute("INSERT INTO api_item (title, category_id, price, discount_price, available_number, total_number, description, picture) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+        c.execute("INSERT INTO api_item (title, category, price, discount_price, available_number, total_number, description, picture) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                   (title, category_id, price, discount_price, available_number, total_number, description, picture))
 
     # Save the changes to the database and close the connection
