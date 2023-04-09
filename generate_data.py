@@ -20,8 +20,8 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
     
     c = conn.cursor()
 
-    # Reset sequence for id column in api_itemcategory table
-    c.execute("ALTER SEQUENCE api_itemcategory_id_seq RESTART WITH 1")
+
+    c.execute("TRUNCATE TABLE api_itemcategory RESTART IDENTITY;")
 
     # Generate fake data for ItemCategory
     for i in range(n):
@@ -29,8 +29,8 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
         subcategory = fake.word() + str(i) if random.choice([True, False]) else None
         c.execute("INSERT INTO api_itemcategory (name, subcategory) VALUES (%s, %s)", (name, subcategory))
 
-    # Reset sequence for id column in api_item table
-    c.execute("ALTER SEQUENCE api_item_id_seq RESTART WITH 1")
+
+    c.execute("TRUNCATE TABLE api_item RESTART IDENTITY;")
 
     # Generate fake data for Item
     for i in range(n):
