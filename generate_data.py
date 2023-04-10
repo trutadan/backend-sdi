@@ -20,19 +20,11 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
     
     c = conn.cursor()
 
-    # Reset sequence for id column in api_itemcategory table
-    c.execute("DELETE FROM api_itemcategory")
-    c.execute("ALTER SEQUENCE api_itemcategory_id_seq RESTART WITH 1")
-
     # Generate fake data for ItemCategory
     for i in range(n):
         name = fake.word() + str(i)
         subcategory = fake.word() + str(i) if random.choice([True, False]) else None
         c.execute("INSERT INTO api_itemcategory (name, subcategory) VALUES (%s, %s)", (name, subcategory))
-
-    # Reset sequence for id column in api_item table
-    c.execute("DELETE FROM api_item")
-    c.execute("ALTER SEQUENCE api_item_id_seq RESTART WITH 1")
 
     # Generate fake data for Item
     for i in range(n):
@@ -45,7 +37,7 @@ def generate_sql_file(n: int) -> Tuple[str, str]:
         description = fake.paragraph(nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
         picture = None
 
-        c.execute("INSERT INTO api_item (title, category_id, price, discount_price, available_number, total_number, description, picture) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+        c.execute("INSERT INTO api_item (title, category, price, discount_price, available_number, total_number, description, picture) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                   (title, category_id, price, discount_price, available_number, total_number, description, picture))
 
     # Save the changes to the database and close the connection

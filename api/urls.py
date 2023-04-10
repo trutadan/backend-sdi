@@ -14,7 +14,7 @@ from api.views.order_item_view import OrderItemList, OrderItemDetail
 from api.views.refund_view import RefundList, RefundDetail
 from api.views.cart_view import CartList, CartDetail
 from api.views.cart_item_view import AddMultipleItemsToCartView, CartItemList, CartItemDetail
-from api.views.item_category_view import ItemCategoryList, ItemCategoryDetail
+from api.views.item_category_view import ItemCategoryAutocomplete, ItemCategoryList, ItemCategoryDetail
 from api.views.most_sold_items_view import MostSoldItemsView
 from api.views.average_category_price_view import AverageCategoryPriceView
 
@@ -31,6 +31,7 @@ urlpatterns = [
 
     path('item/', ItemList.as_view()),
     path('item/<int:pk>/', ItemDetail.as_view()), 
+    path('item/most-sold/', MostSoldItemsView.as_view()),
     path('item/<int:pk>/order/', ItemOrderList.as_view()),
     path('item/<int:pk>/order/<int:order_pk>/', ItemOrderDetail.as_view()),
     path('item/<int:pk>/cart/', ItemCartList.as_view()),
@@ -61,8 +62,6 @@ urlpatterns = [
 
     path('item-category/', ItemCategoryList.as_view()),
     path('item-category/<int:pk>/', ItemCategoryDetail.as_view()),
-
-    path('item/most-sold/', MostSoldItemsView.as_view()),
-
-    path('item-category/average-price/', AverageCategoryPriceView.as_view())
+    path('item-category/average-price/', AverageCategoryPriceView.as_view()),
+    path('item-category/autocomplete/', ItemCategoryAutocomplete.as_view()),
 ]
