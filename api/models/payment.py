@@ -14,7 +14,7 @@ class Payment(models.Model):
 
     def get_amount(self):
         total_amount = 0
-        for item in self.order.orderitem_set.all():
+        for item in self.order.order_items.all():
             if item.item.discount_price:
                 total_amount += item.item.discount_price * item.quantity
             else:

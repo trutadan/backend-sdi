@@ -1,7 +1,11 @@
 from django.urls import path
+from api.views.confirm_register_view import ConfirmRegisterView
+from api.views.login_view import LoginView
+from api.views.logout_view import LogoutView
+from api.views.register_view import RegisterView
 
 from api.views.user_address_view import UserAddressList, UserAddressDetail
-from api.views.user_view import UserList, UserDetail
+from api.views.user_view import UserList, UserDetail, UserView
 from api.views.user_profile_view import UserProfileList, UserProfileDetail
 from api.views.item_view import ItemList, ItemDetail
 from api.views.item_order_view import ItemOrderList, ItemOrderDetail
@@ -23,11 +27,17 @@ urlpatterns = [
     path('user-address/', UserAddressList.as_view()),
     path('user-address/<int:pk>/', UserAddressDetail.as_view()),
 
-    path('user/', UserList.as_view()),
-    path('user/<int:pk>/', UserDetail.as_view()), 
+    path('users/', UserList.as_view()),
+    path('users/<int:pk>/', UserDetail.as_view()), 
 
     path('user-profile/', UserProfileList.as_view()),
     path('user-profile/<int:pk>/', UserProfileDetail.as_view()), 
+
+    path('register/', RegisterView.as_view()),
+    path('register/confirm/<str:confirmation_code>/', ConfirmRegisterView.as_view()),
+    path('login/', LoginView.as_view()),
+    path('user/', UserView.as_view()),
+    path('logout/', LogoutView.as_view()),
 
     path('item/', ItemList.as_view()),
     path('item/<int:pk>/', ItemDetail.as_view()), 
