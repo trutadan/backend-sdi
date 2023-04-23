@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters
 from rest_framework.views import APIView
@@ -5,6 +6,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
 import jwt
+from api.models.cart import Cart
 
 from api.models.user import User
 from api.serializers.user_serializer import UserRegisterSerializer, UserSerializer
@@ -38,6 +40,9 @@ class UserView(APIView):
             raise AuthenticationFailed('Unauthenticated!')
 
         user = User.objects.filter(id=payload['id']).first()
+        if not user:
+            raise AuthenticationFailed('Unauthenticated!')
+
         serializer = UserRegisterSerializer(user)
         
         return Response(serializer.data)

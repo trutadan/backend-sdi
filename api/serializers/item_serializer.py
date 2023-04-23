@@ -59,6 +59,17 @@ class ItemDetailSerializer(serializers.ModelSerializer):
     item_orders = ItemOrderDetailsSerializer(many=True, read_only=True)
     item_carts = ItemCartDetailsSerializer(many=True, read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Determine the request method
+        request = self.context.get('request')
+        is_get_request = request and request.method == 'GET'
+
+        # Dynamically set the category field
+        if is_get_request:
+            self.fields['category'] = ItemCategorySerializer()
+
     def validate(self, data):
         if data['price'] < 0:
             raise serializers.ValidationError('Price must be greater than 0!')

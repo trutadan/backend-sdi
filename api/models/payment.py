@@ -4,7 +4,7 @@ from api.models.order import Order
 
 
 class Payment(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, db_column="order")
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, db_column="order_number")
     timestamp = models.DateTimeField(auto_now_add=True, db_column="timestamp")
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, editable=False)
 

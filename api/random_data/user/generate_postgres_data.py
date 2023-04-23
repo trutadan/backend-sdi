@@ -1,3 +1,5 @@
+import datetime
+import hashlib
 import random
 import sys
 import psycopg2
@@ -31,8 +33,8 @@ def generate_data() -> Tuple[str, str]:
         # create a cursor object to execute SQL queries
         database_cursor = database_connection.cursor()
 
-        # generate fake data for UserAddress
-        for _ in range(number_of_records):
+        for i in range(number_of_records):
+            # generate fake data for UserAddress
             street = fake.street_address()
             city = fake.city()
             state = fake.state()
@@ -41,7 +43,6 @@ def generate_data() -> Tuple[str, str]:
             database_cursor.execute("INSERT INTO api_useraddress (street, city, state, country, zip_code) VALUES (%s, %s, %s, %s, %s)", (street, city, state, country, zip_code))
 
         # generate fake data for UserProfile
-        for _ in range(number_of_records):
             picture = None
             date_of_birth = fake.date_of_birth()
             phone = fake.phone_number()
@@ -49,19 +50,26 @@ def generate_data() -> Tuple[str, str]:
             created_at = fake.date_time_between(start_date='-1y', end_date='now')
             updated_at = created_at
 
-            database_cursor.execute("INSERT INTO api_userprofile (picture, date_of_birth, phone, country_code, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s)", (picture, date_of_birth, phone, country_code, created_at, updated_at))
+            database_cursor.execute("INSERT INTO api_userprofile (profile_picture, date_of_birth, phone_number, country_code, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s)", (picture, date_of_birth, phone, country_code, created_at, updated_at))
 
-        # generate fake data for User
-        for _ in range(number_of_records):
+            # generate fake data for User
             first_name = fake.first_name()
             last_name = fake.last_name()
-            email = fake.email()
-            username = fake.user_name()
-            address = random.randint(1, number_of_records) if random.choice([True, False]) else None
-            profile = random.randint(1, number_of_records) if random.choice([True, False]) else None
+            email = str(fake.random_int()) + fake.email()
+            username = fake.user_name() + str(fake.random_int())
+            password = hashlib.sha256("my_password".encode("utf-8")).hexdigest()
+            address = i
+            profile = i
+            is_active = fake.boolean(chance_of_getting_true=80)
+            confirmation_code = fake.uuid4() 
+            confirmation_code_expiration = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
             created_at = fake.date_time_between(start_date='-1y', end_date='now')
 
-            database_cursor.execute("INSERT INTO api_user (first_name, last_name, email, username, address_id, profile_id, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, email, username, address.id if address else None, profile.id if profile else None, created_at))
+            is_superuser = False
+            is_staff = False
+            date_joined = created_at
+
+            database_cursor.execute("INSERT INTO api_user (first_name, last_name, email, username, address_id, profile_id, is_active, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, email, username, address.id if address else None, profile.id if profile else None, is_active, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password))
 
         # commit the changes to the database and close the connection
         database_connection.commit()

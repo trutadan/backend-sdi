@@ -16,7 +16,7 @@ from api.views.coupon_view import CouponList, CouponDetail
 from api.views.order_view import OrderList, OrderDetail
 from api.views.order_item_view import OrderItemList, OrderItemDetail
 from api.views.refund_view import RefundList, RefundDetail
-from api.views.cart_view import CartList, CartDetail
+from api.views.cart_view import CartList, CartDetail, get_cart_by_user_id
 from api.views.cart_item_view import AddMultipleItemsToCartView, CartItemList, CartItemDetail
 from api.views.item_category_view import ItemCategoryAutocomplete, ItemCategoryList, ItemCategoryDetail
 from api.views.most_sold_items_view import MostSoldItemsView
@@ -69,6 +69,7 @@ urlpatterns = [
     path('cart/<int:pk>/item/', CartItemList.as_view()), 
     path('cart/<int:pk>/item/<int:item_pk>/', CartItemDetail.as_view()), 
     path('cart/<int:pk>/item/add-multiple/', AddMultipleItemsToCartView.as_view()),
+    path('cart/from-user/<int:user_id>/', get_cart_by_user_id),
 
     path('item-category/', ItemCategoryList.as_view()),
     path('item-category/<int:pk>/', ItemCategoryDetail.as_view()),

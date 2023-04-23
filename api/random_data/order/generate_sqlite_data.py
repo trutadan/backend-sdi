@@ -1,3 +1,4 @@
+import datetime
 import random
 import sqlite3
 import sys
@@ -32,8 +33,8 @@ def generate_data() -> Tuple[str, str]:
             amount = random_number
             database_cursor.execute("INSERT INTO api_coupon (code, amount) VALUES (?, ?)", (code, amount))
 
-        # generate fake data for OrderAddress
-        for _ in range(number_of_records):
+        for i in range(number_of_records):
+            # generate fake data for OrderAddress
             country = fake.country()
             state = fake.state()
             city = fake.city()
@@ -44,49 +45,44 @@ def generate_data() -> Tuple[str, str]:
             database_cursor.execute("INSERT INTO api_orderaddress (country, state, city, street, apartment, zip_code) VALUES (?, ?, ?, ?, ?, ?)",
                     (country, state, city, street, apartment, zip_code))
 
-        # generate fake data for Order
-        for _ in range(number_of_records):
+            # generate fake data for Order
             user_id = random.randint(1, number_of_records)
             start_date = fake.date_between(start_date='-2y', end_date='-1y')
-            ordered_date = fake.date_time_between(start_date, 'today', tzinfo=None)
-            shipping_address_id = random.randint(1, number_of_records) if random.choice([True, False]) else None
-            billing_address_id = random.randint(1, number_of_records) if random.choice([True, False]) else None
+            ordered_date = fake.date_time_between(start_date, datetime.datetime.now() - datetime.timedelta(days=1), tzinfo=None)
+            shipping_address_id = i if random.choice([True, False]) else None
+            billing_address_id = i if random.choice([True, False]) else None
             coupon_id = random.randint(1, number_of_records) if random.choice([True, False]) else None
             being_delivered = random.choice([True, False])
             received = random.choice([True, False])
             refund_requested = random.choice([True, False])
             refund_granted = random.choice([True, False])
 
-            database_cursor.execute("INSERT INTO api_order (user_id, start_date, ordered_date, shipping_address_id, billing_address_id, coupon_id, being_delivered, received, refund_requested, refund_granted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            database_cursor.execute("INSERT INTO api_order (user, start_date, ordered_date, shipping_address, billing_address, coupon, delivered_status, received, refund_requested, refund_granted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (user_id, start_date, ordered_date, shipping_address_id, billing_address_id, coupon_id, being_delivered, received, refund_requested, refund_granted))
             
-        # generate fake data for OrderItem
-        for _ in range(number_of_records):
+            # generate fake data for OrderItem
             item_id = random.randint(1, number_of_records)
             order_id = random.randint(1, number_of_records)
             quantity = random.randint(1, 10)
-            price = round(random.uniform(1, 100), 2)
 
-            database_cursor.execute("INSERT INTO api_orderitem (item_id, order_id, quantity, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (item_id, order_id, quantity, price))
+            database_cursor.execute("INSERT INTO api_orderitem (item, order_number, quantity) VALUES (?, ?, ?)",
+                    (item_id, order_id, quantity))
 
-        # generate fake data for Payment
-        for _ in range(number_of_records):
-            order_id = random.randint(1, number_of_records)
-            amount = random.uniform(1.0, 1000.0)
+            # generate fake data for Payment
+            order_id = i
             payment_date = fake.date_time_between('-1y', '+1y', tzinfo=None)
 
-            database_cursor.execute("INSERT INTO api_payment (order_id, amount, payment_date) VALUES (?, ?, ?)",
-                    (order_id, amount, payment_date))
+            database_cursor.execute("INSERT INTO api_payment (order_number, timestamp) VALUES (?, ?)",
+                    (order_id, payment_date))
 
-        # generate fake data for Refund
-        for _ in range(number_of_records):
-            order_id = random.randint(1, number_of_records)
-            amount = random.uniform(1.0, 1000.0)
-            refund_date = fake.date_time_between('-1y', '+1y', tzinfo=None)
+            # generate fake data for Refund
+            if random.choice([True, False]) == True:
+                order_id = i
+                reason = fake.sentence(nb_words=5, variable_nb_words=True, ext_word_list=None)
+                accepted = random.choice([True, False])
 
-            database_cursor.execute("INSERT INTO api_refund (order_id, amount, refund_date) VALUES (?, ?, ?)",
-                    (order_id, amount, refund_date))
+                database_cursor.execute("INSERT INTO api_refund (order_number, reason, status) VALUES (?, ?, ?)",
+                        (order_id, reason, accepted))
 
         # commit the changes to the database and close the connection
         database_connection.commit()
