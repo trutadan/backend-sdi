@@ -17,7 +17,7 @@ class RegisterView(APIView):
         user = serializer.save()
 
         # Generate confirmation code and expiration time
-        confirmation_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        confirmation_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         confirmation_expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         
         # Save confirmation code and expiration time to user

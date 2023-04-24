@@ -3,6 +3,7 @@ from api.views.confirm_register_view import ConfirmRegisterView
 from api.views.login_view import LoginView
 from api.views.logout_view import LogoutView
 from api.views.register_view import RegisterView
+from api.views.resend_register_confirmation_view import ResendRegisterConfirmationView
 
 from api.views.user_address_view import UserAddressList, UserAddressDetail
 from api.views.user_view import UserList, UserDetail, UserView
@@ -35,6 +36,7 @@ urlpatterns = [
 
     path('register/', RegisterView.as_view()),
     path('register/confirm/<str:confirmation_code>/', ConfirmRegisterView.as_view()),
+    path('register/resend-confirmation/', ResendRegisterConfirmationView.as_view()),
     path('login/', LoginView.as_view()),
     path('user/', UserView.as_view()),
     path('logout/', LogoutView.as_view()),
