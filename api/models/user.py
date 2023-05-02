@@ -21,6 +21,14 @@ class User(AbstractUser):
 
     REQUIRED_FIELDS = []
 
+    class Role(models.TextChoices):    
+        ADMIN = "ADMIN", "Admin"
+        STUDENT = "STUDENT", "Moderator"
+        REGULAR = "REGULAR", "Regular"
+        ANONYMOUS = "ANONYMOUS", "Anonymous"
+
+    role = models.CharField(max_length=50, choices=Role.choices, blank=True, null=True, db_column="role")
+
     def __str__(self):
         return f"user {self.username}" 
     

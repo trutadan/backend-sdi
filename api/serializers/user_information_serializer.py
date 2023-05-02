@@ -1,35 +1,29 @@
-from rest_framework import serializers
-
 import re
+from rest_framework import serializers
 
 from api.models.user import User
 
+from api.serializers.user_address_serializer import UserAddressSerializer
+from api.serializers.user_profile_serializer import UserProfileSerializer
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = "__all__"
-
-
-class UserRegisterSerializer(serializers.ModelSerializer):
-    confirm_password = serializers.CharField(write_only=True)
+class UserInformationSerializer(serializers.ModelSerializer):
+    address = UserAddressSerializer()
+    profile = UserProfileSerializer()
 
     class Meta:
         model = User
-        fields = ["id", "first_name", "last_name", "email", "username", "password", "confirm_password"]
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        instance = self.Meta.model(**validated_data)
-        if password is not None:
-            instance.set_password(password)
-        instance.save()
-        return instance
+        exclude = ['last_login', 'is_superuser', 'is_staff', 'date_joined', 'password', 'confirmation_code', 'confirmation_code_expiration', 'groups', 'user_permissions']
     
     def validate(self, data):
+        if not data['zip_code'].isdigit():
+            raise serializers.ValidationError('Zip code must contain only digits!')
+        
+        if not data['phone'].isdigit():
+            raise serializers.ValidationError('Phone number must contain only digits!')
+        
+        if len(data['phone']) != 10:
+            raise serializers.ValidationError('Phone number must be 10 digits long!')
+        
         if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', data['email']):
             raise serializers.ValidationError("Invalid email address format.")
 
@@ -54,5 +48,5 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = self.instance or self.Meta.model(**data)
         if user.username.lower() in data['password'].lower():
             raise serializers.ValidationError("Password is too weak.")
-
+        
         return data

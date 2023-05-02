@@ -4,9 +4,9 @@ from api.views.login_view import LoginView
 from api.views.logout_view import LogoutView
 from api.views.register_view import RegisterView
 from api.views.resend_register_confirmation_view import ResendRegisterConfirmationView
-
 from api.views.user_address_view import UserAddressList, UserAddressDetail
-from api.views.user_view import UserList, UserDetail, UserView
+from api.views.user_information_view import UserInformationView
+from api.views.user_view import UserList, UserDetail, UserAuthenticationView, email_exists, username_exists
 from api.views.user_profile_view import UserProfileList, UserProfileDetail
 from api.views.item_view import ItemList, ItemDetail
 from api.views.item_order_view import ItemOrderList, ItemOrderDetail
@@ -31,14 +31,18 @@ urlpatterns = [
     path('users/', UserList.as_view()),
     path('users/<int:pk>/', UserDetail.as_view()), 
 
+    path('users/username-exists/', username_exists),
+    path('users/email-exists/', email_exists),
+
     path('user-profile/', UserProfileList.as_view()),
+    path('user-profile/information/', UserInformationView.as_view()),
     path('user-profile/<int:pk>/', UserProfileDetail.as_view()), 
 
     path('register/', RegisterView.as_view()),
     path('register/confirm/<str:confirmation_code>/', ConfirmRegisterView.as_view()),
     path('register/resend-confirmation/', ResendRegisterConfirmationView.as_view()),
     path('login/', LoginView.as_view()),
-    path('user/', UserView.as_view()),
+    path('user/', UserAuthenticationView.as_view()),
     path('logout/', LogoutView.as_view()),
 
     path('item/', ItemList.as_view()),

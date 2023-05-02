@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from api.models.user_address import UserAddress
-from api.models.user import User
 
 
 class UserAddressSerializer(serializers.ModelSerializer):

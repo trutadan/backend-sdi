@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters
 from rest_framework.views import APIView
@@ -6,7 +6,6 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 
 import jwt
-from api.models.cart import Cart
 
 from api.models.user import User
 from api.serializers.user_serializer import UserRegisterSerializer, UserSerializer
@@ -27,7 +26,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
 
-class UserView(APIView):
+class UserAuthenticationView(APIView):
     def get(self, request):
         token = request.COOKIES.get('jwt')
 
@@ -46,3 +45,42 @@ class UserView(APIView):
         serializer = UserRegisterSerializer(user)
         
         return Response(serializer.data)
+
+
+class UserConfirmationView(APIView):
+    def get(self, request):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated!')
+        
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        user = User.objects.filter(id=payload['id']).first()
+        if not user:
+            raise AuthenticationFailed('Unauthenticated!')
+
+        serializer = UserSerializer(user)
+        
+        return Response(serializer.data)
+
+
+def username_exists(request):
+    username = request.GET.get('username', '')
+    if not username:
+        return JsonResponse({'error': 'Username is required.'}, status=400)
+    
+    user_exists = User.objects.filter(username__iexact=username).exists()
+    return JsonResponse({'exists': user_exists})
+
+
+def email_exists(request):
+    email = request.GET.get('email', '')
+    if not email:
+        return JsonResponse({'error': 'Email is required.'}, status=400)
+    
+    email_exists = User.objects.filter(email__iexact=email).exists()
+    return JsonResponse({'exists': email_exists})

@@ -1,13 +1,15 @@
+import pytz
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 
 import random
 import string
 import datetime
 
 from api.serializers.user_serializer import UserRegisterSerializer
+from config.settings import EMAIL_HOST_USER
 
 
 class RegisterView(APIView):
@@ -18,7 +20,7 @@ class RegisterView(APIView):
 
         # Generate confirmation code and expiration time
         confirmation_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        confirmation_expiration = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+        confirmation_expiration = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) + datetime.timedelta(minutes=10)
         
         # Save confirmation code and expiration time to user
         user.confirmation_code = confirmation_code
@@ -28,8 +30,9 @@ class RegisterView(APIView):
         # Send confirmation email
         subject = 'Confirm your account'
         message = f'Your confirmation code is {confirmation_code}'
-        from_email = 'noreply@example.com'
+        from_email = EMAIL_HOST_USER
         recipient_list = [user.email]
-        send_mail(subject, message, from_email, recipient_list)
+        email = EmailMessage(subject, message, from_email, recipient_list)
+        email.send()
 
-        return Response(serializer.data)
+        return Response({'message': 'Account created successfully!'})
