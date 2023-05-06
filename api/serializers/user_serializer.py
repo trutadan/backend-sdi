@@ -56,3 +56,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password is too weak.")
 
         return data
+    
+
+class UserRolesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'role']

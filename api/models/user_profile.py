@@ -10,5 +10,5 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_column="updated_at")
 
     def __str__(self):
-        return f"{self.user}'s profile having the phone number {self.phone}"
+        return f"{self.country_code} {self.phone} for the date of birth {self.date_of_birth}"
   

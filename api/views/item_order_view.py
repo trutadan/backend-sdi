@@ -1,14 +1,21 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from django.http import Http404
 
 from api.models.item import Item
 from api.models.order_item import OrderItem
 from api.serializers.order_item_serializer import OrderItemSerializer
+from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege
+from api.authentication import CustomUserAuthentication
+
 
 class ItemOrderList(generics.ListCreateAPIView):
     serializer_class = OrderItemSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, IsAdminOrModerator,)
 
     def get_queryset(self, *args, **kwargs):
         item_pk = self.kwargs['pk']
@@ -35,7 +42,10 @@ class ItemOrderList(generics.ListCreateAPIView):
 
 class ItemOrderDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
-
+    
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    
     def get_object(self, *args, **kwargs):
         item_pk = self.kwargs['pk']
         order_pk = self.kwargs['order_pk']

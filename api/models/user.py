@@ -11,7 +11,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=20, db_column="last_name")
     email = models.EmailField(unique=True, db_column="email")
     username = models.CharField(unique=True, db_index=True, max_length=50, db_column="username")
-    password = models.CharField(max_length=50, db_column="password")
+    password = models.CharField(max_length=100, db_column="password")
     address = models.OneToOneField(UserAddress, blank=True, null=True, on_delete=models.SET_NULL, db_column="address")
     profile = models.OneToOneField(UserProfile, blank=True, null=True, on_delete=models.SET_NULL, db_column="profile")
     is_active = models.BooleanField(default=False, db_column="is_active")
@@ -23,11 +23,33 @@ class User(AbstractUser):
 
     class Role(models.TextChoices):    
         ADMIN = "ADMIN", "Admin"
-        STUDENT = "STUDENT", "Moderator"
+        MODERATOR = "MODERATOR", "Moderator"
         REGULAR = "REGULAR", "Regular"
-        ANONYMOUS = "ANONYMOUS", "Anonymous"
 
     role = models.CharField(max_length=50, choices=Role.choices, blank=True, null=True, db_column="role")
+
+    def save(self, *args, **kwargs):
+        # User is being created
+        if not self.pk: 
+            if self.is_superuser:
+                self.is_staff = True
+                self.role = self.Role.ADMIN
+            else:
+                self.is_staff = False
+                self.role = self.Role.REGULAR
+        # User is being updated
+        else:  
+            if self.role == self.Role.REGULAR:
+                self.is_staff = False
+                self.is_superuser = False
+            if self.role == self.Role.MODERATOR:
+                self.is_staff = True
+                self.is_superuser = False
+            if self.role == self.Role.ADMIN:
+                self.is_staff = True
+                self.is_superuser = True
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"user {self.username}" 

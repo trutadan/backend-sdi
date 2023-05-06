@@ -11,15 +11,22 @@ import string
 import datetime
 
 from api.models.user import User
-from api.views.user_view import UserConfirmationView
+from api.views.user_view import ActivateUserAccountView
 
 from config.settings import EMAIL_HOST_USER
 
+from rest_framework.permissions import IsAuthenticated
+
+from api.authentication import CustomUserAuthentication
+
 
 class ResendRegisterConfirmationView(APIView):
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         # Get current authenticated user
-        user_view = UserConfirmationView()
+        user_view = ActivateUserAccountView()
         user_data = user_view.get(request).data
 
         # Check if user's account is already activated

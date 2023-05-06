@@ -5,9 +5,13 @@ from django.db.models import Avg
 from api.models.item_category import ItemCategory
 from api.serializers.average_category_price_dto import AverageCategoryPriceDTO
 
+from rest_framework.permissions import AllowAny
+
 
 class AverageCategoryPriceView(generics.ListAPIView):
     serializer_class = AverageCategoryPriceDTO
+
+    permission_classes = (AllowAny, )
 
     def get_queryset(self):
         queryset = ItemCategory.objects.annotate(

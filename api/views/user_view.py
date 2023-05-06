@@ -1,14 +1,20 @@
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, filters
-from rest_framework.views import APIView
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.response import Response
 
-import jwt
+from rest_framework import generics, filters, status
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.exceptions import NotFound
+
+from api.authentication import CustomUserAuthentication
 
 from api.models.user import User
-from api.serializers.user_serializer import UserRegisterSerializer, UserSerializer
+from api.permissions import IsAdmin, UserIsOwner
+
+from api.serializers.user_serializer import UserRegisterSerializer, UserRolesSerializer, UserSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -20,54 +26,45 @@ class UserList(generics.ListCreateAPIView):
     search_fields = ['$first_name', '$last_name', '$username']
     ordering_fields = ['created_at']
 
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
+
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    authentication_classes = (CustomUserAuthentication, )
+    permission_classes = (IsAuthenticated, (UserIsOwner|IsAdmin),)
 
-class UserAuthenticationView(APIView):
+
+class AuthenticatedUserInformationView(APIView):
+    serializer_class = UserRegisterSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
-        token = request.COOKIES.get('jwt')
-
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
-        
-        try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        user = User.objects.filter(id=payload['id']).first()
-        if not user:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        serializer = UserRegisterSerializer(user)
-        
+        user = request.user
+        serializer = self.serializer_class(user)
         return Response(serializer.data)
 
 
-class UserConfirmationView(APIView):
+class ActivateUserAccountView(APIView):
+    serializer_class = UserSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
-        token = request.COOKIES.get('jwt')
-
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
-        
-        try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        user = User.objects.filter(id=payload['id']).first()
-        if not user:
-            raise AuthenticationFailed('Unauthenticated!')
-
-        serializer = UserSerializer(user)
-        
+        user = request.user
+        serializer = self.serializer_class(user)
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@renderer_classes([JSONRenderer])
 def username_exists(request):
     username = request.GET.get('username', '')
     if not username:
@@ -77,6 +74,9 @@ def username_exists(request):
     return JsonResponse({'exists': user_exists})
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@renderer_classes([JSONRenderer])
 def email_exists(request):
     email = request.GET.get('email', '')
     if not email:
@@ -84,3 +84,43 @@ def email_exists(request):
     
     email_exists = User.objects.filter(email__iexact=email).exists()
     return JsonResponse({'exists': email_exists})
+
+
+class UserRolesListView(APIView):
+    serializer_class = UserRolesSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAdmin,)
+
+    def get(self, request):
+        users = User.objects.all()
+        serializer = self.serializer_class(users, many=True)
+        return Response(serializer.data)
+
+
+class UserRolesDetailsView(APIView):
+    serializer_class = UserRolesSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAdmin,)
+
+    def get_user(self, pk):
+        try:
+            return User.objects.get(id=pk)
+        except User.DoesNotExist:
+            raise NotFound(detail="User not found!")
+
+    def get(self, request, pk):
+        user = self.get_user(pk)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        user = self.get_user(pk)
+        serializer = self.serializer_class(user, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

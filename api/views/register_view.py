@@ -11,8 +11,12 @@ import datetime
 from api.serializers.user_serializer import UserRegisterSerializer
 from config.settings import EMAIL_HOST_USER
 
+from rest_framework.permissions import AllowAny
+
 
 class RegisterView(APIView):
+    permission_classes = (AllowAny,)
+
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

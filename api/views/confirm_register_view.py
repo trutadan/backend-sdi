@@ -8,13 +8,20 @@ import datetime
 import pytz
 
 from api.models.user import User
-from api.views.user_view import UserConfirmationView
+from api.views.user_view import ActivateUserAccountView
+
+from api.authentication import CustomUserAuthentication
+
+from rest_framework.permissions import IsAuthenticated
 
 
 class ConfirmRegisterView(APIView):
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, confirmation_code):
         # Get current authenticated user
-        user_view = UserConfirmationView()
+        user_view = ActivateUserAccountView()
         user_data = user_view.get(request).data
 
         # Check if user's account is already activated

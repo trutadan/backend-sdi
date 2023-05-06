@@ -5,8 +5,13 @@ from django.db.models import Sum
 from api.models.item import Item
 from api.serializers.most_sold_items_dto import MostSoldItemsDTO
 
+from rest_framework.permissions import AllowAny
+
+
 class MostSoldItemsView(generics.ListAPIView):
     serializer_class = MostSoldItemsDTO
+
+    permission_classes = (AllowAny, )
 
     def get_queryset(self):
         queryset = Item.objects.annotate(total_pieces_sold=Sum('item_orders__quantity')).exclude(total_pieces_sold=None)
