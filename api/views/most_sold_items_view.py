@@ -1,10 +1,9 @@
-from rest_framework import generics
-
-from django.db.models import Sum
-
 from api.models.item import Item
 from api.serializers.most_sold_items_dto import MostSoldItemsDTO
 
+from django.db.models import Sum
+
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 

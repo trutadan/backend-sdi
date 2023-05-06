@@ -1,17 +1,13 @@
-from django.http import JsonResponse
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-from rest_framework import status
-
 import datetime
 import pytz
 
 from api.models.user import User
 from api.views.user_view import ActivateUserAccountView
-
 from api.authentication import CustomUserAuthentication
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 

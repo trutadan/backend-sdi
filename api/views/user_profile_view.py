@@ -1,12 +1,11 @@
-from django_filters.rest_framework import DjangoFilterBackend
-
 from api.authentication import CustomUserAuthentication
 from api.models.user_profile import UserProfile
-from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege, UserProfileIsOwner
+from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege, IsUserProfileOwner
 from api.serializers.user_profile_serializer import UserProfileSerializer
 
-from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, filters
 
 
@@ -28,5 +27,5 @@ class UserProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserProfileSerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, (UserProfileIsOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    permission_classes = (IsAuthenticated, (IsUserProfileOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
     

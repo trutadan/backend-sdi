@@ -1,10 +1,8 @@
-from rest_framework import generics, status
-from rest_framework.response import Response
-
 from api.authentication import CustomUserAuthentication
-
 from api.serializers.user_information_serializer import UserInformationSerializer
 
+from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 

@@ -1,18 +1,24 @@
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from django.http import Http404
-
 from api.models.cart import Cart
 from api.models.item import Item
 from api.models.cart_item import CartItem
 from api.serializers.cart_item_serializer import CartItemSerializer
 from api.serializers.cart_serializer import CartSerializer
+from api.authentication import CustomUserAuthentication
+from api.permissions import IsUserCartItemOwner, IsAdmin, IsModeratorWithNoDeletePrivilege
+
+from django.http import Http404
+
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 
 class CartItemList(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsUserCartItemOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
     def get_queryset(self, *args, **kwargs):
         cart_pk = self.kwargs['pk']
@@ -41,6 +47,9 @@ class CartItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     lookup_url_kwarg = 'item_pk'
 
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsUserCartItemOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+
     def get_object(self, *args, **kwargs):
         cart_pk = self.kwargs['pk']
         item_pk = self.kwargs['item_pk']
@@ -59,6 +68,11 @@ class CartItemDetail(generics.RetrieveUpdateDestroyAPIView):
     
 
 class AddMultipleItemsToCartView(APIView):
+    serializer_class = CartSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsUserCartItemOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+
     def post(self, request, pk):
         cart = Cart.objects.get(pk=pk)
         items = request.data.get('items', [])
@@ -76,6 +90,6 @@ class AddMultipleItemsToCartView(APIView):
 
             cart_item.save()
         
-        serializer = CartSerializer(cart)
+        serializer = self.serializer_class(cart)
         
         return Response(serializer.data)

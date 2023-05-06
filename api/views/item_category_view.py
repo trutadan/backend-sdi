@@ -1,14 +1,14 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, filters
+from api.models.item_category import ItemCategory
+from api.serializers.item_category_serializer import ItemCategorySerializer
+from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege, IsGetRequest
+from api.authentication import CustomUserAuthentication
 
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import generics, filters
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from api.models.item_category import ItemCategory
-from api.serializers.item_category_serializer import ItemCategorySerializer
-from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege
-from api.authentication import CustomUserAuthentication
 
 
 class ItemCategoryList(generics.ListCreateAPIView):
@@ -16,7 +16,7 @@ class ItemCategoryList(generics.ListCreateAPIView):
     serializer_class = ItemCategorySerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, IsAdminOrModerator,)
+    permission_classes = (IsAuthenticated, (IsGetRequest|IsAdminOrModerator,))
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['$name', '$subcategory']
@@ -27,14 +27,14 @@ class ItemCategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ItemCategorySerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, (IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    permission_classes = (IsAuthenticated, (IsGetRequest|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
 
 class ItemCategoryAutocomplete(APIView):
     serializer_class = ItemCategorySerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, IsAdminOrModerator,)
+    permission_classes = (IsAuthenticated, (IsGetRequest|IsAdminOrModerator,))
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('query')

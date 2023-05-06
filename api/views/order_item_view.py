@@ -1,14 +1,21 @@
-from rest_framework import generics, status
-from rest_framework.response import Response
-
-from django.http import Http404
-
 from api.models.order import Order
 from api.models.order_item import OrderItem
 from api.serializers.order_item_serializer import OrderItemSerializer
+from api.authentication import CustomUserAuthentication
+from api.permissions import IsUserOrderItemOwner, IsAdmin, IsModeratorWithNoDeletePrivilege
+
+from django.http import Http404
+
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
 
 class OrderItemList(generics.ListCreateAPIView):
     serializer_class = OrderItemSerializer
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsUserOrderItemOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
     def get_queryset(self, *args, **kwargs):
         order_pk = self.kwargs['pk']
@@ -36,6 +43,9 @@ class OrderItemList(generics.ListCreateAPIView):
 class OrderItemDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderItemSerializer
     lookup_url_kwarg = 'item_pk'
+
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (IsUserOrderItemOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
     def get_object(self, *args, **kwargs):
         order_pk = self.kwargs['pk']

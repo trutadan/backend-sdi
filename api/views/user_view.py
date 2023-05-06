@@ -1,3 +1,8 @@
+from api.authentication import CustomUserAuthentication
+from api.models.user import User
+from api.permissions import IsAdmin, IsUserOwner
+from api.serializers.user_serializer import UserRegisterSerializer, UserRolesSerializer, UserSerializer
+
 from django.http import JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -6,28 +11,21 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import NotFound
-
-from api.authentication import CustomUserAuthentication
-
-from api.models.user import User
-from api.permissions import IsAdmin, UserIsOwner
-
-from api.serializers.user_serializer import UserRegisterSerializer, UserRolesSerializer, UserSerializer
 
 
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
+
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {'created_at': ['gte', 'lte']}
     search_fields = ['$first_name', '$last_name', '$username']
     ordering_fields = ['created_at']
-
-    authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, IsAdmin,)
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -35,7 +33,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
     authentication_classes = (CustomUserAuthentication, )
-    permission_classes = (IsAuthenticated, (UserIsOwner|IsAdmin),)
+    permission_classes = (IsAuthenticated, (IsUserOwner|IsAdmin),)
 
 
 class AuthenticatedUserInformationView(APIView):
@@ -90,7 +88,7 @@ class UserRolesListView(APIView):
     serializer_class = UserRolesSerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
 
     def get(self, request):
         users = User.objects.all()
@@ -102,7 +100,7 @@ class UserRolesDetailsView(APIView):
     serializer_class = UserRolesSerializer
 
     authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAuthenticated, IsAdmin,)
 
     def get_user(self, pk):
         try:

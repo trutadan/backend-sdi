@@ -1,11 +1,12 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, filters
-from rest_framework.permissions import IsAuthenticated
-
 from api.models.order_address import OrderAddress
 from api.serializers.order_address_serializer import OrderAddressSerializer
 from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege
 from api.authentication import CustomUserAuthentication
+
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import generics, filters
+from rest_framework.permissions import IsAuthenticated
 
 
 class OrderAddressList(generics.ListCreateAPIView):

@@ -1,10 +1,9 @@
-from rest_framework import generics
-
-from django.db.models import Avg
-
 from api.models.item_category import ItemCategory
 from api.serializers.average_category_price_dto import AverageCategoryPriceDTO
 
+from django.db.models import Avg
+
+from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
 

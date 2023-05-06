@@ -1,12 +1,12 @@
-from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework import generics, filters
-from rest_framework.permissions import IsAuthenticated
-
 from api.authentication import CustomUserAuthentication
 from api.models.coupon import Coupon
 from api.serializers.coupon_serializer import CouponSerializer
 from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege
+
+from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_framework import generics, filters
+from rest_framework.permissions import IsAuthenticated
 
 
 class CouponList(generics.ListCreateAPIView):

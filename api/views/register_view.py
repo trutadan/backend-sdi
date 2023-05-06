@@ -1,16 +1,16 @@
 import pytz
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-from django.core.mail import EmailMessage
-
 import random
 import string
 import datetime
 
-from api.serializers.user_serializer import UserRegisterSerializer
 from config.settings import EMAIL_HOST_USER
 
+from api.serializers.user_serializer import UserRegisterSerializer
+
+from django.core.mail import EmailMessage
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
 

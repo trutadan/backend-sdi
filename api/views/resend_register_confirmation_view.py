@@ -1,23 +1,20 @@
 import pytz
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-from django.core.mail import EmailMessage
-
-from rest_framework import status
-
 import random
 import string
 import datetime
 
 from api.models.user import User
 from api.views.user_view import ActivateUserAccountView
+from api.authentication import CustomUserAuthentication
 
 from config.settings import EMAIL_HOST_USER
 
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from api.authentication import CustomUserAuthentication
+from django.core.mail import EmailMessage
 
 
 class ResendRegisterConfirmationView(APIView):
