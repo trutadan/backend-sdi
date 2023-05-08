@@ -60,6 +60,7 @@ def generate_data() -> Tuple[str, str]:
             password = hashlib.sha256("my_password".encode("utf-8")).hexdigest()
             address = i
             profile = i
+            role = "REGULAR"
             is_active = fake.boolean(chance_of_getting_true=80)
             confirmation_code = fake.uuid4() 
             confirmation_code_expiration = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
@@ -69,7 +70,7 @@ def generate_data() -> Tuple[str, str]:
             is_staff = False
             date_joined = created_at
 
-            database_cursor.execute("INSERT INTO api_user (first_name, last_name, email, username, address_id, profile_id, is_active, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, email, username, address.id if address else None, profile.id if profile else None, is_active, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password))
+            database_cursor.execute("INSERT INTO api_user (first_name, last_name, email, username, address_id, profile_id, is_active, role, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (first_name, last_name, email, username, address.id if address else None, profile.id if profile else None, is_active, role, confirmation_code, confirmation_code_expiration, created_at, is_superuser, is_staff, date_joined, password))
 
         # commit the changes to the database and close the connection
         database_connection.commit()

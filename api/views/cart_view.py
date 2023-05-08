@@ -35,9 +35,9 @@ class CartDetail(generics.RetrieveUpdateDestroyAPIView):
 @api_view(['GET'])
 @authentication_classes([CustomUserAuthentication])
 @permission_classes([IsAuthenticated, GetIfUserIsCartOwner|IsAdmin|IsModeratorWithNoDeletePrivilege])
-def get_cart_by_user_id(user_id):
-    # Get the user object using the user_id
-    user = get_object_or_404(User, pk=user_id)
+def get_cart_by_user(request):
+    # Get the user object using the authenticated user from the request
+    user = request.user
 
     # Get the cart object using the user object
     cart = get_object_or_404(Cart, user=user)
