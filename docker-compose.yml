@@ -5,7 +5,7 @@ services:
     container_name: django_web
     build: .
     image: backend-sdi
-    command: gunicorn config.wsgi --workers 4 --bind 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./app/:/usr/src/app/
     ports:

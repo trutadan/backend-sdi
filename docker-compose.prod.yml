@@ -13,6 +13,7 @@ services:
       - ./.env.prod
     depends_on:
       - db
+
   db:
     image: postgres:13.0-alpine
     volumes:
@@ -21,37 +22,18 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=db
-  nginx-proxy:
-    container_name: nginx-proxy
-    build: nginx
-    restart: always
-    ports:
-      - 443:443
-      - 80:80
+
+  nginx:
+    build: ./nginx
     volumes:
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
-      - vhost:/etc/nginx/vhost.d
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - static_volume:/home/app/web/staticfiles
+      - media_volume:/home/app/web/mediafiles
+    ports:
+      - 1337:80
     depends_on:
       - web
-  nginx-proxy-letsencrypt:
-    container_name: nginx-proxy-letsencrypt
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    env_file:
-      - ./.env.prod
-    volumes:
-      - certs:/etc/nginx/certs
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - acme:/etc/acme.sh
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on:
-      - nginx-proxy
 
 volumes:
   postgres_data:
-  certs:
-  html:
-  vhost:
-  acme:
+  static_volume:
+  media_volume:
