@@ -1,23 +1,34 @@
-FROM python:3.10.10-alpine as builder
+###########
+# BUILDER #
+###########
+
+# pull official base image
+FROM python:3.9.6-alpine as builder
 
 # set work directory
 WORKDIR /usr/src/app
-
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install dependencies
+# install psycopg2 dependencies
 RUN apk update \
     && apk add postgresql-dev gcc python3-dev musl-dev
 
 # install dependencies
+RUN pip install --upgrade pip
 COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 
-FROM python:3.10.10-alpine
+#########
+# FINAL #
+#########
+
+# pull official base image
+FROM python:3.9.6-alpine
+
 # create directory for the app user
 RUN mkdir -p /home/app
 
