@@ -7,7 +7,7 @@ from api.authentication import CustomUserAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import generics, filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 
@@ -15,8 +15,17 @@ class ItemList(generics.ListCreateAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
-    authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, (IsGetRequest|IsAdminOrModerator,))
+    def get_authenticators(self):
+        if self.request.method == 'GET':
+            return ()
+        else:
+            return (CustomUserAuthentication(),)
+        
+    def get_permission(self):
+        if self.request.method == 'GET':
+            return (AllowAny(),)
+        else:
+            return (IsAuthenticated(), IsAdminOrModerator(),)
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {'price': ['gte', 'lte'], 
@@ -30,5 +39,14 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemDetailSerializer
 
-    authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, (IsGetRequest|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    def get_authenticators(self):
+        if self.request.method == 'GET':
+            return ()
+        else:
+            return (CustomUserAuthentication(),)
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return (AllowAny(),)
+        else:
+            return [IsAuthenticated(), (IsAdmin | IsModeratorWithNoDeletePrivilege)()]
