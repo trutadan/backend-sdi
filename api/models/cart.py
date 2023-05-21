@@ -4,7 +4,7 @@ from api.models.user import User
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, db_column="user")
+    user = models.OneToOneField(User, db_index=True, on_delete=models.CASCADE, db_column="user")
     created_at = models.DateTimeField(auto_now_add=True, db_column="created_at")
 
     def __str__(self):

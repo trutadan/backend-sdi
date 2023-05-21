@@ -34,6 +34,8 @@ ALLOWED_HOSTS = [os.environ.get('ALLOWED_HOSTS')]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +53,9 @@ INSTALLED_APPS = [
 
     'rest_framework.authtoken', 
     'dj_rest_auth',
+
+    'channels',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -181,3 +186,11 @@ REST_AUTH = {
 AUTH_USER_MODEL = 'api.User'
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

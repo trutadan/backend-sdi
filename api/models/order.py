@@ -6,7 +6,7 @@ from api.models.coupon import Coupon
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user")
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE, db_column="user")
     start_date = models.DateTimeField(auto_now_add=True, db_column="start_date")
     ordered_date = models.DateTimeField(db_column="ordered_date")
     shipping_address = models.ForeignKey(OrderAddress, related_name="shipping_address", blank=True, null=True, on_delete=models.SET_NULL, db_column="shipping_address")

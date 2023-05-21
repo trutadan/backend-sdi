@@ -1,7 +1,7 @@
 from api.models.item import Item
 from api.serializers.item_serializer import ItemSerializer
 from api.serializers.item_serializer import ItemDetailSerializer
-from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege, IsGetRequest
+from api.permissions import IsAdmin, IsAdminOrModerator, IsModeratorWithNoDeletePrivilege
 from api.authentication import CustomUserAuthentication
 
 from django_filters.rest_framework import DjangoFilterBackend

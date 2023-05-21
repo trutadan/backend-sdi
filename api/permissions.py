@@ -80,9 +80,3 @@ class GetIfUserIsPaymentOwner(permissions.BasePermission):
 class IsUserRefundOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.order.user == request.user
-
-
-# Request permissions
-class IsGetRequest(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.method == 'GET'
