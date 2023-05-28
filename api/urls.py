@@ -1,5 +1,6 @@
 from django.urls import path
 from api.views.confirm_register_view import ConfirmRegisterView
+from api.views.estimate_delivery_date_view import delivery_date_view
 from api.views.login_view import LoginView
 from api.views.logout_view import LogoutView
 from api.views.register_view import RegisterView
@@ -69,6 +70,8 @@ urlpatterns = [
     path('order/<int:pk>/', OrderDetail.as_view()), 
     path('order/<int:pk>/item/', OrderItemList.as_view()),
     path('order/<int:pk>/item/<int:item_pk>/', OrderItemDetail.as_view()),
+
+    path('predict-delivery-date/<int:order_id>/', delivery_date_view),
 
     path('refund/', RefundList.as_view()),
     path('refund/<int:pk>/', RefundDetail.as_view()), 

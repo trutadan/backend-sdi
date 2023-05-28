@@ -1,5 +1,4 @@
 from api.models.cart import Cart
-from api.models.user import User
 from api.serializers.cart_serializer import CartSerializer
 from api.authentication import CustomUserAuthentication
 from api.permissions import GetIfUserIsCartOwner, IsAdmin, IsModeratorWithNoDeletePrivilege
