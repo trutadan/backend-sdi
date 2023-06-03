@@ -12,6 +12,16 @@ class OrderSerializer(serializers.ModelSerializer):
         return obj.order_items.count()
 
     def validate(self, data):
+        if data['received_date'] is not None:
+            if data['received_date'] > data['ordered_date']:
+                raise serializers.ValidationError('The received date must be before the ordered date!')
+
+        if data['received_date'] is None and data['received'] is not None:
+            raise serializers.ValidationError('The received order must have a received date!')
+        
+        if data['received_date'] is not None and data['received'] is None:
+            raise serializers.ValidationError('The order must have a true received status!')
+
         if data['being_delivered'] == data['received']:
             raise serializers.ValidationError('The order is either being delivered or already received!')
         

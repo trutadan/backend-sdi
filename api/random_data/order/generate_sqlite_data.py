@@ -47,17 +47,29 @@ def generate_data() -> Tuple[str, str]:
 
             # generate fake data for Order
             user_id = random.randint(1, number_of_records)
-            start_date = fake.date_between(start_date='-2y', end_date='-1y')
-            ordered_date = fake.date_time_between(start_date, datetime.datetime.now() - datetime.timedelta(days=1), tzinfo=None)
-            shipping_address_id = i if random.choice([True, False]) else None
-            billing_address_id = i if random.choice([True, False]) else None
+            start_date = fake.date_between(start_date=datetime.datetime.now() - datetime.timedelta(days=3*365), end_date=datetime.datetime.now())
+            days_to_add = random.randint(2, 5)
+            ordered_date = start_date + datetime.timedelta(days=days_to_add)
+            shipping_address_id = i
+            billing_address_id = i
             coupon_id = random.randint(1, number_of_records) if random.choice([True, False]) else None
-            being_delivered = random.choice([True, False])
-            received = random.choice([True, False])
-            refund_requested = random.choice([True, False])
-            refund_granted = random.choice([True, False])
 
-            database_cursor.execute("INSERT INTO api_order (user, start_date, ordered_date, shipping_address, billing_address, coupon, delivered_status, received, refund_requested, refund_granted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            received = random.choice([True, False])
+            if (received == False):
+                ordered_date = None
+                being_delivered = random.choice([True, False])
+                refund_requested = False
+                refund_granted = False
+
+            else:
+                being_delivered = False
+                refund_requested = random.choice([True, False])
+                if (refund_requested == True):
+                    refund_granted = random.choice([True, False])
+                else:
+                    refund_granted = False
+
+            database_cursor.execute("INSERT INTO api_order (user, order_placed_date, received_date, shipping_address, billing_address, coupon, delivered_status, received, refund_requested, refund_granted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     (user_id, start_date, ordered_date, shipping_address_id, billing_address_id, coupon_id, being_delivered, received, refund_requested, refund_granted))
             
             # generate fake data for OrderItem

@@ -1,5 +1,5 @@
 from api.authentication import CustomUserAuthentication
-from api.ml_models.predict_shipping_time.real_time_prediction import estimate_delivery_date
+from api.ml_model.real_time_prediction import estimate_delivery_date
 from api.permissions import IsAdmin, IsModeratorWithNoDeletePrivilege
 from api.models.order import Order
 from api.views.user_view import AuthenticatedUserInformationView
@@ -10,8 +10,8 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 
 @api_view(['GET'])
-@authentication_classes([CustomUserAuthentication])
-@permission_classes([AuthenticatedUserInformationView, IsAdmin|IsModeratorWithNoDeletePrivilege])
+# @authentication_classes([CustomUserAuthentication])
+# @permission_classes([AuthenticatedUserInformationView, IsAdmin|IsModeratorWithNoDeletePrivilege])
 def delivery_date_view(request, order_id):
     try:
         # Retrieve the estimated location and delivery date

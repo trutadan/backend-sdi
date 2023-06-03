@@ -14,12 +14,12 @@ class OrderList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    authentication_classes = (CustomUserAuthentication,)
-    permission_classes = (IsAuthenticated, (GetIfUserIsOrderOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    # authentication_classes = (CustomUserAuthentication,)
+    # permission_classes = (IsAuthenticated, (GetIfUserIsOrderOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = {'start_date': ['gte', 'lte'], 
-                        'ordered_date': ['gte', 'lte'],
+    filterset_fields = {'order_placed_date': ['gte', 'lte'], 
+                        'received_date': ['gte', 'lte'],
                         'being_delivered': ['exact'],
                         'received': ['exact'],
                         'refund_requested': ['exact'],
