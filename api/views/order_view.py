@@ -14,8 +14,8 @@ class OrderList(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    # authentication_classes = (CustomUserAuthentication,)
-    # permission_classes = (IsAuthenticated, (GetIfUserIsOrderOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
+    authentication_classes = (CustomUserAuthentication,)
+    permission_classes = (IsAuthenticated, (GetIfUserIsOrderOwner|IsAdmin|IsModeratorWithNoDeletePrivilege),)
 
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = {'order_placed_date': ['gte', 'lte'], 

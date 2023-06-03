@@ -10,8 +10,8 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 
 @api_view(['GET'])
-# @authentication_classes([CustomUserAuthentication])
-# @permission_classes([AuthenticatedUserInformationView, IsAdmin|IsModeratorWithNoDeletePrivilege])
+@authentication_classes([CustomUserAuthentication])
+@permission_classes([AuthenticatedUserInformationView, IsAdmin|IsModeratorWithNoDeletePrivilege])
 def delivery_date_view(request, order_id):
     try:
         # Retrieve the estimated location and delivery date
